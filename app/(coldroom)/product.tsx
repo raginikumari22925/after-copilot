@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { COLD_ROOM_DEFAULTS } from '@/constants/coldRoomData';
+import { COLD_ROOM_DEFAULTS, COLD_ROOM_PRODUCTS } from '@/constants/coldRoomData';
 import { Header } from '@/components/Header';
 import { InputCard } from '@/components/InputCard';
 import { PickerCard } from '@/components/PickerCard';
-import { PRODUCTS, STORAGE_FACTORS } from '@/constants/productData';
+import { STORAGE_FACTORS } from '@/constants/productData';
 
 export default function ColdRoomProductScreen() {
   const [product, setProduct] = useState({
@@ -14,6 +14,8 @@ export default function ColdRoomProductScreen() {
     dailyLoad: COLD_ROOM_DEFAULTS.dailyProductLoad.toString(),
     incomingTemp: COLD_ROOM_DEFAULTS.productIncomingTemp.toString(),
     outgoingTemp: COLD_ROOM_DEFAULTS.productOutgoingTemp.toString(),
+    specificHeatAbove: COLD_ROOM_DEFAULTS.specificHeatAbove.toString(),
+    respirationRate: COLD_ROOM_DEFAULTS.respirationRate.toString(),
     storageType: COLD_ROOM_DEFAULTS.storageType,
     numberOfPeople: COLD_ROOM_DEFAULTS.numberOfPeople.toString(),
     workingHours: COLD_ROOM_DEFAULTS.hoursWorking.toString(),
@@ -44,17 +46,7 @@ export default function ColdRoomProductScreen() {
     }
   };
 
-  // Filter products suitable for cold room
-  const coldRoomProducts = [
-    'Vegetables (Mixed)',
-    'Fruits (Mixed)', 
-    'Beverages',
-    'Dairy Products',
-    'Pharmaceutical',
-    'General Food Items'
-  ];
-
-  const productOptions = coldRoomProducts.map(key => ({
+  const productOptions = Object.keys(COLD_ROOM_PRODUCTS).map(key => ({
     label: key,
     value: key,
   }));
@@ -64,7 +56,7 @@ export default function ColdRoomProductScreen() {
     value: key,
   }));
 
-  const selectedProduct = PRODUCTS[product.productType as keyof typeof PRODUCTS];
+  const selectedColdRoomProduct = COLD_ROOM_PRODUCTS[product.productType as keyof typeof COLD_ROOM_PRODUCTS] || COLD_ROOM_PRODUCTS["BANANA"];
   const selectedStorageFactor = STORAGE_FACTORS[product.storageType as keyof typeof STORAGE_FACTORS];
   
   // Calculate storage capacity (will need room dimensions from AsyncStorage)
@@ -86,7 +78,7 @@ export default function ColdRoomProductScreen() {
     loadRoomData();
   }, []);
 
-  const maxStorageCapacity = roomVolume * selectedProduct.density * selectedProduct.storageEfficiency * selectedStorageFactor;
+  const maxStorageCapacity = roomVolume * selectedColdRoomProduct.density * selectedColdRoomProduct.storageEfficiency * selectedStorageFactor;
   const storageUtilization = maxStorageCapacity > 0 ? (parseFloat(product.dailyLoad) / maxStorageCapacity) * 100 : 0;
   const totalInternalLoad = (parseFloat(product.lightingWattage) + parseFloat(product.equipmentLoad)) / 1000;
 
@@ -124,6 +116,20 @@ export default function ColdRoomProductScreen() {
             unit="°C" 
             value={product.outgoingTemp} 
             onChangeText={(value) => handleInputChange('outgoingTemp', value)} 
+          />
+          
+          <InputCard 
+            label="Specific Heat Above Freezing" 
+            unit="kJ/kg·K" 
+            value={product.specificHeatAbove} 
+            onChangeText={(value) => handleInputChange('specificHeatAbove', value)} 
+          />
+          
+          <InputCard 
+            label="Respiration Rate" 
+            unit="W/tonne" 
+            value={product.respirationRate} 
+            onChangeText={(value) => handleInputChange('respirationRate', value)} 
           />
           
           <PickerCard
@@ -172,15 +178,19 @@ export default function ColdRoomProductScreen() {
           <View style={styles.propertiesCard}>
             <View style={styles.propertyRow}>
               <Text style={styles.propertyLabel}>Specific Heat:</Text>
-              <Text style={styles.propertyValue}>{selectedProduct.specificHeatAbove} kJ/kg·K</Text>
+              <Text style={styles.propertyValue}>{selectedColdRoomProduct.specificHeatAbove} kJ/kg·K</Text>
             </View>
             <View style={styles.propertyRow}>
               <Text style={styles.propertyLabel}>Density:</Text>
-              <Text style={styles.propertyValue}>{selectedProduct.density} kg/m³</Text>
+              <Text style={styles.propertyValue}>{selectedColdRoomProduct.density} kg/m³</Text>
             </View>
             <View style={styles.propertyRow}>
               <Text style={styles.propertyLabel}>Storage Efficiency:</Text>
-              <Text style={styles.propertyValue}>{(selectedProduct.storageEfficiency * 100).toFixed(0)}%</Text>
+              <Text style={styles.propertyValue}>{(selectedColdRoomProduct.storageEfficiency * 100).toFixed(0)}%</Text>
+            </View>
+            <View style={styles.propertyRow}>
+              <Text style={styles.propertyLabel}>Respiration Rate:</Text>
+              <Text style={styles.propertyValue}>{selectedColdRoomProduct.respirationRate} W/tonne</Text>
             </View>
           </View>
         </View>
@@ -202,8 +212,8 @@ export default function ColdRoomProductScreen() {
               <Text style={styles.summaryValue}>{totalInternalLoad.toFixed(2)} kW</Text>
             </View>
             <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>People Load:</Text>
-              <Text style={styles.summaryValue}>{(parseFloat(product.numberOfPeople) * 0.407 * (parseFloat(product.workingHours) / 24)).toFixed(3)} kW</Text>
+              <Text style={styles.summaryLabel}>Respiration Load:</Text>
+              <Text style={styles.summaryValue}>{((parseFloat(product.dailyLoad) / 1000) * parseFloat(product.respirationRate) / 1000).toFixed(3)} kW</Text>
             </View>
           </View>
         </View>

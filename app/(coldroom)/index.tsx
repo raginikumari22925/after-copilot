@@ -14,6 +14,10 @@ export default function ColdRoomScreen() {
     doorWidth: COLD_ROOM_DEFAULTS.doorWidth.toString(),
     doorHeight: COLD_ROOM_DEFAULTS.doorHeight.toString(),
     doorOpenings: COLD_ROOM_DEFAULTS.dailyDoorOpenings.toString(),
+    // NEW MISSING INPUTS
+    doorClearOpening: COLD_ROOM_DEFAULTS.doorClearOpening.toString(),
+    storageDensity: COLD_ROOM_DEFAULTS.storageDensity.toString(),
+    airFlowPerFan: COLD_ROOM_DEFAULTS.airFlowPerFan.toString(),
   });
 
   useEffect(() => {
@@ -72,6 +76,27 @@ export default function ColdRoomScreen() {
             value={dimensions.doorOpenings} 
             onChangeText={(value) => handleInputChange('doorOpenings', value)} 
           />
+          
+          <InputCard 
+            label="Door Clear Opening" 
+            unit="mm" 
+            value={dimensions.doorClearOpening} 
+            onChangeText={(value) => handleInputChange('doorClearOpening', value)} 
+          />
+          
+          <InputCard 
+            label="Storage Density" 
+            unit="kg/m³" 
+            value={dimensions.storageDensity} 
+            onChangeText={(value) => handleInputChange('storageDensity', value)} 
+          />
+          
+          <InputCard 
+            label="Air Flow Per Fan" 
+            unit="CFM" 
+            value={dimensions.airFlowPerFan} 
+            onChangeText={(value) => handleInputChange('airFlowPerFan', value)} 
+          />
         </View>
 
         <View style={styles.section}>
@@ -103,10 +128,12 @@ export default function ColdRoomScreen() {
 
         <View style={styles.infoCard}>
           <Text style={styles.infoTitle}>Typical Cold Room Specifications</Text>
-          <Text style={styles.infoText}>• Temperature range: 0°C to +15°C</Text>
-          <Text style={styles.infoText}>• Standard cold room: +2°C to +8°C</Text>
+          <Text style={styles.infoText}>• Temperature range: +2°C to +15°C</Text>
+          <Text style={styles.infoText}>• Excel example: +2°C storage temperature</Text>
           <Text style={styles.infoText}>• Door openings: 15-30 times/day typical</Text>
-          <Text style={styles.infoText}>• Pull-down time: 4-8 hours typical</Text>
+          <Text style={styles.infoText}>• Pull-down time: 24 hours (Excel standard)</Text>
+          <Text style={styles.infoText}>• Storage density: 8 kg/m³ (Excel example)</Text>
+          <Text style={styles.infoText}>• Air flow: 4163 CFM recommended</Text>
         </View>
       </ScrollView>
     </LinearGradient>

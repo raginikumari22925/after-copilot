@@ -4,12 +4,17 @@ import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLD_ROOM_DEFAULTS } from '@/constants/coldRoomData';
 import { Header } from '@/components/Header';
+import { InputCard } from '@/components/InputCard';
 import { PickerCard } from '@/components/PickerCard';
 
 export default function ColdRoomConstructionScreen() {
   const [construction, setConstruction] = useState({
     insulationType: COLD_ROOM_DEFAULTS.insulationType,
     insulationThickness: COLD_ROOM_DEFAULTS.insulationThickness,
+    // NEW MISSING INPUTS
+    internalFloorThickness: COLD_ROOM_DEFAULTS.internalFloorThickness.toString(),
+    numberOfHeaters: COLD_ROOM_DEFAULTS.numberOfHeaters.toString(),
+    numberOfDoors: COLD_ROOM_DEFAULTS.numberOfDoors.toString(),
   });
 
   useEffect(() => {
@@ -25,6 +30,13 @@ export default function ColdRoomConstructionScreen() {
 
   const handleInsulationThicknessChange = (value: string | number) => {
     const newConstruction = { ...construction, insulationThickness: value as number };
+    setConstruction(newConstruction);
+    // Save immediately
+    AsyncStorage.setItem('coldRoomConstructionData', JSON.stringify(newConstruction)).catch(console.error);
+  };
+
+  const handleInputChange = (key: keyof typeof construction, value: string) => {
+    const newConstruction = { ...construction, [key]: value };
     setConstruction(newConstruction);
     // Save immediately
     AsyncStorage.setItem('coldRoomConstructionData', JSON.stringify(newConstruction)).catch(console.error);
@@ -86,6 +98,27 @@ export default function ColdRoomConstructionScreen() {
             options={thicknessOptions}
             onValueChange={handleInsulationThicknessChange}
           />
+          
+          <InputCard 
+            label="Internal Floor Thickness" 
+            unit="mm" 
+            value={construction.internalFloorThickness} 
+            onChangeText={(value) => handleInputChange('internalFloorThickness', value)} 
+          />
+          
+          <InputCard 
+            label="Number of Heaters" 
+            unit="units" 
+            value={construction.numberOfHeaters} 
+            onChangeText={(value) => handleInputChange('numberOfHeaters', value)} 
+          />
+          
+          <InputCard 
+            label="Number of Doors" 
+            unit="units" 
+            value={construction.numberOfDoors} 
+            onChangeText={(value) => handleInputChange('numberOfDoors', value)} 
+          />
         </View>
 
         <View style={styles.section}>
@@ -109,11 +142,12 @@ export default function ColdRoomConstructionScreen() {
 
         <View style={styles.infoCard}>
           <Text style={styles.infoTitle}>Cold Room Insulation Guidelines</Text>
+          <Text style={styles.infoText}>• Excel U-factor: 0.295 W/m²K (all surfaces)</Text>
           <Text style={styles.infoText}>• PUF (Polyurethane): Best thermal performance, most common</Text>
           <Text style={styles.infoText}>• EPS (Polystyrene): Cost-effective, good performance</Text>
           <Text style={styles.infoText}>• Rockwool: Fire resistant, good for special applications</Text>
           <Text style={styles.infoText}>• Thickness: 100-150mm typical for cold rooms</Text>
-          <Text style={styles.infoText}>• Lower U-factor = better insulation performance</Text>
+          <Text style={styles.infoText}>• Floor thickness: 100mm (Excel standard)</Text>
         </View>
       </ScrollView>
     </LinearGradient>

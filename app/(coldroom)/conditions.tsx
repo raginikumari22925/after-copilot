@@ -98,12 +98,12 @@ export default function ColdRoomConditionsScreen() {
 
         <View style={styles.infoCard}>
           <Text style={styles.infoTitle}>Typical Cold Room Conditions</Text>
-          <Text style={styles.infoText}>• Standard cold room: +2°C to +8°C</Text>
+          <Text style={styles.infoText}>• Excel example: +2°C storage temperature</Text>
+          <Text style={styles.infoText}>• Excel ambient: +45°C external temperature</Text>
           <Text style={styles.infoText}>• Pharmaceutical storage: +2°C to +8°C</Text>
           <Text style={styles.infoText}>• Produce storage: +1°C to +4°C</Text>
-          <Text style={styles.infoText}>• External ambient: 25°C to 45°C</Text>
-          <Text style={styles.infoText}>• Continuous operation: 24 hours/day</Text>
-          <Text style={styles.infoText}>• Pull-down time: 4-8 hours typical</Text>
+          <Text style={styles.infoText}>• Operating hours: 20 hours/day (Excel example)</Text>
+          <Text style={styles.infoText}>• Pull-down time: 24 hours (Excel standard)</Text>
         </View>
       </ScrollView>
     </LinearGradient>
